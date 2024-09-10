@@ -1,0 +1,41 @@
+
+# Ignorar la carpeta del entorno virtual
+.venv/
+
+# Ignorar archivos de configuración y logs
+*.log
+*.csv
+*.dat
+*.out
+*.pid
+*.seed
+
+
+
+# Virtual environment
+venv/
+env/
+.env
+ 
+# Flask
+instance/
+.webassess-cache 
+ 
+# SQLite database
+*.db
+ 
+client_secret.json
+
+# IDE specific files
+.vscode/
+.idea/
+ 
+# OS generated files
+.DS_Store
+Thumbs.db
+ 
+# Logs
+*.log
+ 
+# Temporary files
+*.tmp

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <title>Mis Tareas</title>
+    <style>
+
+        
+        .user-card{
+            position: absolute;
+            top: 10px;
+            right:10px;
+        }
+        .task-column {
+            min-height: 500px;
+            border: 2px dashed #42a5f5;
+            padding: 10px;
+        }
+        body {
+            background-color: #192537; 
+            color: #e3f2fd; 
+        }
+        .logout-btn a {
+            background-color: #1565c0; 
+            color: white;
+        }
+        .card {
+            background-color: #1e88e5; 
+            color: white;
+            border: none;
+            margin-bottom: 10px;
+            cursor: grab;
+        }
+        .card:active {
+            cursor: grabbing;
+        }
+        .btn-primary {
+            background-color: #42a5f5; 
+            border-color: #42a5f5;
+        }
+        .btn-success {
+            background-color: #03af67; 
+            border-color: #03af67;
+        }
+        .btn-danger {
+            background-color: #ff5252;
+            border-color: #ff5252;
+        }
+        .form-control, .form-select {
+            background-color: #0d47a1; 
+            color: white;
+            border: none;
+        }
+        .form-control::placeholder {
+            color: #bbdefb;
+        }
+    </style>
+</head>
+<body>
+
+     
+    <div class="user-card">
+         <!-- Mostrar nombre del usuario -->
+        <div class="user-info">
+            <span>Usuario: {{ current_user.username }}</span>
+        </div>
+
+        <!-- Botón de cerrar sesión -->
+        <div class="logout-btn">
+            <a href="/logout" class="btn btn-secondary">Cerrar sesión</a>
+        </div>
+    </div>
+   
+
+    <div class="container mt-5">
+        <h1 class="text-center">Mis Tareas</h1>
+
+        <div class="d-flex justify-content-center">
+            <div class="card mt-4" style="width: 60%;">
+                <div class="card-body flex-column">
+                    <h4 class="card-title">Agregar nueva tarea</h4>
+                    <form action="/add" method="POST">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" name="descripcion" placeholder="Nueva Tarea" required>
+                        </div>
+                        <div class="mt-auto">
+                            <button type="submit" class="btn btn-primary w-100">Agregar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <!-- Columna para "Sin iniciar" -->
+            <div class="col-md-4">
+                <h4>Sin iniciar</h4>
+                <div class="task-column droppable" data-status="Sin iniciar">
+                    {% for tarea in tareas %}
+                        {% if tarea.estado == 'Sin iniciar' %}
+                        <div class="card draggable" data-id="{{ tarea.id }}">
+                            <div class="card-body d-flex flex-column">
+                                <form action="/edit/{{ tarea.id }}" method="POST">
+                                    <div class="mb-3">
+                                        <input type="text" class="form-control" name="descripcion" value="{{ tarea.descripcion }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <select name="estado" class="form-select">
+                                            <option value="Sin iniciar" {% if tarea.estado == 'Sin iniciar' %}selected{% endif %}>Sin iniciar</option>
+                                            <option value="En proceso" {% if tarea.estado == 'En proceso' %}selected{% endif %}>En proceso</option>
+                                            <option value="Terminado" {% if tarea.estado == 'Terminado' %}selected{% endif %}>Terminado</option>
+                                        </select>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <button type="submit" class="btn btn-success">Guardar</button>
+                                        <a href="/delete/{{ tarea.id }}" class="btn btn-danger">Eliminar</a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Columna para "En proceso" -->
+            <div class="col-md-4">
+                <h4>En proceso</h4>
+                <div class="task-column droppable" data-status="En proceso">
+                    {% for tarea in tareas %}
+                        {% if tarea.estado == 'En proceso' %}
+                        <div class="card draggable" data-id="{{ tarea.id }}">
+                            <div class="card-body d-flex flex-column">
+                                <form action="/edit/{{ tarea.id }}" method="POST">
+                                    <div class="mb-3">
+                                        <input type="text" class="form-control" name="descripcion" value="{{ tarea.descripcion }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <select name="estado" class="form-select">
+                                            <option value="Sin iniciar" {% if tarea.estado == 'Sin iniciar' %}selected{% endif %}>Sin iniciar</option>
+                                            <option value="En proceso" {% if tarea.estado == 'En proceso' %}selected{% endif %}>En proceso</option>
+                                            <option value="Terminado" {% if tarea.estado == 'Terminado' %}selected{% endif %}>Terminado</option>
+                                        </select>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <button type="submit" class="btn btn-success">Guardar</button>
+                                        <a href="/delete/{{ tarea.id }}" class="btn btn-danger">Eliminar</a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Columna para "Terminado" -->
+            <div class="col-md-4">
+                <h4>Terminado</h4>
+                <div class="task-column droppable" data-status="Terminado">
+                    {% for tarea in tareas %}
+                        {% if tarea.estado == 'Terminado' %}
+                        <div class="card draggable" data-id="{{ tarea.id }}">
+                            <div class="card-body d-flex flex-column">
+                                <form action="/edit/{{ tarea.id }}" method="POST">
+                                    <div class="mb-3">
+                                        <input type="text" class="form-control" name="descripcion" value="{{ tarea.descripcion }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <select name="estado" class="form-select">
+                                            <option value="Sin iniciar" {% if tarea.estado == 'Sin iniciar' %}selected{% endif %}>Sin iniciar</option>
+                                            <option value="En proceso" {% if tarea.estado == 'En proceso' %}selected{% endif %}>En proceso</option>
+                                            <option value="Terminado" {% if tarea.estado == 'Terminado' %}selected{% endif %}>Terminado</option>
+                                        </select>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <button type="submit" class="btn btn-success">Guardar</button>
+                                        <a href="/delete/{{ tarea.id }}" class="btn btn-danger">Eliminar</a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script>
+        $(function() {
+            // Hacer las tarjetas arrastrables
+            $(".draggable").draggable({
+                revert: "invalid"
+            });
+
+            // Hacer las columnas "soltables"
+            $(".droppable").droppable({
+                accept: ".draggable",
+                drop: function(event, ui) {
+                    var status = $(this).data("status");
+                    var taskId = ui.helper.data("id");
+
+                    // Actualizar el estado de la tarea en el servidor
+                    $.ajax({
+                        url: "/update_status",
+                        method: "POST",
+                        data: {
+                            id: taskId,
+                            status: status
+                        },
+                        success: function(response) {
+                            location.reload(); // Recargar la página para actualizar las tareas
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
