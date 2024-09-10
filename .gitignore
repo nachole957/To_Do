@@ -24,7 +24,7 @@ instance/
 # SQLite database
 *.db
  
-client_secret.json
+
 
 # IDE specific files
 .vscode/

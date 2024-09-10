@@ -2,11 +2,11 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+import pymysql
 
 app = Flask(__name__)
 
 # Configuración de la base de datos
-
 app.config['SECRET_KEY'] = 'tu_secret_key_super_secreta'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root@localhost/todo_app'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -15,6 +15,17 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+# Crear base de datos si no existe
+def crear_base_datos():
+    connection = pymysql.connect(host='localhost', user='root', password='')
+    cursor = connection.cursor()
+    cursor.execute("CREATE DATABASE IF NOT EXISTS todo_app")
+    connection.commit()
+    cursor.close()
+    connection.close()
+
+crear_base_datos()
 
 # Modelo de Usuario
 class Usuario(UserMixin, db.Model):
@@ -121,7 +132,3 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(debug=True)
-
-
-
-
