@@ -2,30 +2,18 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-import pymysql
 
 app = Flask(__name__)
 
-# Configuración de la base de datos
-#app.config['SECRET_KEY'] = 'jsjsj'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root@localhost/todo_app'
+# Configuración de la base de datos usando SQLite
+app.config['SECRET_KEY'] = 'jsjsj'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todo_app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
-
-# Crear base de datos si no existe
-def crear_base_datos():
-    connection = pymysql.connect(host='localhost', user='root', password='')
-    cursor = connection.cursor()
-    cursor.execute("CREATE DATABASE IF NOT EXISTS todo_app")
-    connection.commit()
-    cursor.close()
-    connection.close()
-
-crear_base_datos()
 
 # Modelo de Usuario
 class Usuario(UserMixin, db.Model):
@@ -100,6 +88,12 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        # Verificar si el nombre de usuario ya existe
+        user_exists = Usuario.query.filter_by(username=username).first()
+        
+        if user_exists:
+            return 'El nombre de usuario ya está en uso, elige otro.'
+
         hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
         new_user = Usuario(username=username, password=hashed_password)
         db.session.add(new_user)
