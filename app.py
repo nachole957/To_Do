@@ -1,14 +1,16 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+import secrets
 
 app = Flask(__name__)
 
-# Configuración de la base de datos
+# Configuración de la base de datos y la clave secreta
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todo_app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'jsjsj'
+app.config['SECRET_KEY'] = secrets.token_hex(16)  # Clave secreta segura generada
+
 db = SQLAlchemy(app)
 
 login_manager = LoginManager()
@@ -88,6 +90,10 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        existing_user = Usuario.query.filter_by(username=username).first()
+        if existing_user:
+            flash('Este nombre de usuario ya existe.')
+            return redirect(url_for('register'))
         hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
         new_user = Usuario(username=username, password=hashed_password)
         db.session.add(new_user)
@@ -105,7 +111,8 @@ def login():
         if user and check_password_hash(user.password, password):
             login_user(user)
             return redirect(url_for('index'))
-        return 'Nombre de usuario o contraseña incorrectos'
+        flash('Nombre de usuario o contraseña incorrectos')
+        return redirect(url_for('login'))
     return render_template('login.html')
 
 # Ruta para cerrar sesión
