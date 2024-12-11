@@ -1,5 +1,12 @@
 import pytest
 from app import app, db
+import sys
+import os
+
+# Agrega el directorio raíz al sistema de rutas
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from app import app, db  # Importa app y db
 
 @pytest.fixture(scope="module")
 def test_client():
