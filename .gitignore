@@ -9,6 +9,7 @@
 *.out
 *.pid
 *.seed
+*.json
 
 
 
@@ -25,7 +26,6 @@ instance/
 *.db
  
 
-
 # IDE specific files
 .vscode/
 .idea/
@@ -33,9 +33,11 @@ instance/
 # OS generated files
 .DS_Store
 Thumbs.db
- 
-# Logs
-*.log
- 
-# Temporary files
-*.tmp
+desktop.ini
+
+# Archivos sensibles
+client_secret.json
+
+# Configuración de despliegue local
+app.log
+config.py
